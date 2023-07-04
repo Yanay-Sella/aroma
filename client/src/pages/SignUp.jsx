@@ -1,13 +1,19 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import axios from "axios";
 
 const SignUp = () => {
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+
   const [userData, setUserData] = useState({
     fnm: "",
     lnm: "",
     email: "",
+    phone: "",
     comment: "",
   });
+
+  const { fnm, lnm, email, phone, comment } = userData;
 
   const type = (e) => {
     const { name, value } = e.target;
@@ -16,9 +22,14 @@ const SignUp = () => {
     });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit");
+    try {
+      const response = await axios.post(`${serverUrl}/user/signup`, userData);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -36,6 +47,7 @@ const SignUp = () => {
           placeholder="first name"
           name="fnm"
           onChange={type}
+          value={fnm}
         />
         <input
           className="bg-gray-900 rounded-md p-1 px-3 text-white"
@@ -43,6 +55,7 @@ const SignUp = () => {
           placeholder="last name"
           name="lnm"
           onChange={type}
+          value={lnm}
         />
         <input
           className="bg-gray-900 rounded-md p-1 px-3 text-white"
@@ -50,6 +63,15 @@ const SignUp = () => {
           placeholder="email"
           name="email"
           onChange={type}
+          value={email}
+        />
+        <input
+          className="bg-gray-900 rounded-md p-1 px-3 text-white"
+          type="text"
+          placeholder="phone number"
+          name="phone"
+          onChange={type}
+          value={phone}
         />
         <textarea
           className="bg-gray-900 rounded-md p-1 px-3 text-white"
@@ -57,6 +79,7 @@ const SignUp = () => {
           placeholder="comment"
           name="comment"
           onChange={type}
+          value={comment}
         />
         <button
           onClick={onSubmit}
