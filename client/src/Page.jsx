@@ -2,7 +2,7 @@ import React from "react";
 
 const Page = ({ children }) => {
   return (
-    <main className="flex flex-col items-center justify-center bg-gray-950 h-screen">
+    <main className="flex flex-col items-center justify-center bg-black h-screen">
       {children}
     </main>
   );
