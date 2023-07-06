@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useValidate from "../hooks/useValidate";
 import {
   faPencil,
   faTrashCan,
@@ -13,23 +14,14 @@ import {
 
 const User = ({ userInfo, setUsersArr }) => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
-  //validation
-  const namePattern = /^[a-z]{1,10}$/i; //first and last
-  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  const phonePattern = /^0\d{9}$/;
 
   const [originalUser, setOriginalUser] = useState(userInfo);
   const [isEdit, setIsEdit] = useState(false);
 
-  const [fnmValid, setFnmValid] = useState(true);
-  const [lnmValid, setLnmValid] = useState(true);
-  const [emailValid, setEmailValid] = useState(true);
-  const [phoneValid, setPhoneValid] = useState(true);
-
   const [isLoading, setIsloading] = useState(false);
   const [fail, setFail] = useState(false);
 
-  const [failMsg, setFailMsg] = useState("error");
+  const [failMsg, setFailMsg] = useState("input not valid");
 
   const { fnm, lnm, email, phone, comment, id } = originalUser; //original user
 
@@ -44,6 +36,16 @@ const User = ({ userInfo, setUsersArr }) => {
 
   const { uFnm, uLnm, uEmail, uPhone, uComment } = newUser;
 
+  const {
+    fnmValid,
+    lnmValid,
+    emailValid,
+    phoneValid,
+    checkValidate,
+    setPhoneValid,
+    setEmailValid,
+  } = useValidate({ fnm: uFnm, lnm: uLnm, email: uEmail, phone: uPhone });
+
   useEffect(() => {
     setNewUser({
       uFnm: fnm,
@@ -54,8 +56,6 @@ const User = ({ userInfo, setUsersArr }) => {
     });
     setFail(false);
     setIsloading(false);
-    setFnmValid(true);
-    setLnmValid(true);
     setEmailValid(true);
     setPhoneValid(true);
   }, [isEdit]);
@@ -82,26 +82,12 @@ const User = ({ userInfo, setUsersArr }) => {
   };
 
   const updateUser = async () => {
-    //validation
-    let unvalid = false;
-    if (!namePattern.test(uFnm)) {
-      setFnmValid(false);
-      unvalid = true;
-    } else setFnmValid(true);
-
-    if (!namePattern.test(uLnm)) {
-      setLnmValid(false);
-      unvalid = true;
-    } else setLnmValid(true);
-    if (!emailPattern.test(uEmail)) {
-      setEmailValid(false);
-      unvalid = true;
-    } else setEmailValid(true);
-    if (!phonePattern.test(uPhone)) {
-      setPhoneValid(false);
-      unvalid = true;
-    } else setPhoneValid(true);
-    if (unvalid) return;
+    const valid = checkValidate();
+    console.log(valid);
+    if (!valid) {
+      setFail(true);
+      return;
+    }
 
     try {
       setIsloading(true);
@@ -151,7 +137,7 @@ const User = ({ userInfo, setUsersArr }) => {
   };
 
   return (
-    <div className="relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider bg-gray-950 bg-opacity-95">
+    <div className="hover:shadow-md hover:shadow-gray-700 relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider bg-gray-950 bg-opacity-95">
       {isEdit ? (
         <form className="flex flex-col items-start gap-2">
           <span className="flex gap-3 mb-2 self-center">
@@ -241,7 +227,7 @@ const User = ({ userInfo, setUsersArr }) => {
           </div>
           <div>
             <p className="text-red-600 ">{`Comment:`}</p>
-            <p>{`${comment}`}</p>
+            <p>{comment ? `"${comment}"` : `No comment`}</p>
           </div>
         </div>
       )}
