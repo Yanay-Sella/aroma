@@ -151,7 +151,7 @@ const User = ({ userInfo, setUsersArr }) => {
   };
 
   return (
-    <div className="relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider bg-gray-950 bg-opacity-95">
+    <div className="hover:shadow-md hover:shadow-gray-700 relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider bg-gray-950 bg-opacity-95">
       {isEdit ? (
         <form className="flex flex-col items-start gap-2">
           <span className="flex gap-3 mb-2 self-center">

@@ -32,7 +32,7 @@ const Users = () => {
           <Logo />
           <div className="flex gap-4 ">
             <div
-              className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+              className="hover:shadow-md hover:shadow-gray-700 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
               onClick={() => {
                 navigate("/");
               }}
@@ -40,7 +40,7 @@ const Users = () => {
               <FontAwesomeIcon icon={faHouse} />
             </div>
             <div
-              className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+              className="hover:shadow-md hover:shadow-gray-700 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
               onClick={() => {
                 navigate("/signup");
               }}
