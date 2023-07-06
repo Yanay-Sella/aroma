@@ -8,15 +8,15 @@ const validate = (fnm, lnm, email, phone, comment) => {
   if (!namePattern.test(fnm) || !namePattern.test(lnm)) return false;
   if (!emailPattern.test(email)) return false;
   if (!phonePattern.test(phone)) return false;
-  if (typeof comment !== "string") {
-    return false;
-  }
+  if (typeof comment !== "string") return false;
+
+  console.log("Validation passed");
   return true;
 };
 
 const getAllUsers = async (req, res) => {
   try {
-    const allUsers = await pool.query("SELECT * FROM users");
+    const allUsers = await pool.query("SELECT * FROM users ORDER BY id");
     return res.status(200).json(allUsers.rows);
   } catch (error) {
     console.log(error);
@@ -26,7 +26,8 @@ const getAllUsers = async (req, res) => {
 
 const handleSignUp = async (req, res) => {
   try {
-    const { fnm, lnm, email, phone, comment } = req.body;
+    let { fnm, lnm, email, phone, comment } = req.body;
+    email = email.toLowerCase();
     console.log(validate(fnm, lnm, email, phone, comment));
     if (!validate(fnm, lnm, email, phone, comment)) {
       return res.status(400).json({ message: "input not valid" });
@@ -56,6 +57,7 @@ const handleSignUp = async (req, res) => {
       "INSERT INTO users (fnm, lnm, email, phone, comment) values ($1, $2, $3, $4, $5) RETURNING *",
       [fnm, lnm, email, phone, comment]
     );
+    console.log("User added");
     return res.status(200).json(newUser.rows[0]);
   } catch (error) {
     console.log(error);
@@ -70,6 +72,7 @@ const handleDelete = async (req, res) => {
       "DELETE FROM users WHERE email=$1 RETURNING *",
       [email]
     );
+    console.log("User deleted");
     return res.status(200).json(deletedUser.rows[0]);
   } catch (error) {
     return res.status(500).json({ message: "server error" });
@@ -77,11 +80,9 @@ const handleDelete = async (req, res) => {
 };
 
 const handleEdit = async (req, res) => {
-  //TODO: add conflicts
-
   try {
     const newUser = req.body;
-    const {
+    let {
       uFnm: fnm,
       uLnm: lnm,
       uEmail: email,
@@ -89,14 +90,38 @@ const handleEdit = async (req, res) => {
       uComment: comment,
       id,
     } = newUser;
-
+    email = email.toLowerCase();
     if (!validate(fnm, lnm, email, phone, comment))
       return res.status(400).json({ message: "input not valid" });
+
+    let existingUser;
+    let conflict = "";
+    //checking if user already exist
+    existingUser = await pool.query(
+      "SELECT * FROM users WHERE (email=$1 AND id!=$2)",
+      [email, id]
+    );
+    existingUser = existingUser.rows[0];
+    if (existingUser) {
+      conflict = "e"; //email conflict
+    }
+    existingUser = await pool.query(
+      "SELECT * FROM users WHERE (phone=$1 AND id!=$2)",
+      [phone, id]
+    );
+    existingUser = existingUser.rows[0];
+    if (existingUser) {
+      conflict = conflict + "p"; //phone conflict
+    }
+
+    if (conflict !== "")
+      return res.status(409).json({ message: "conflict", conflict });
 
     const updatedUser = await pool.query(
       "UPDATE users SET fnm=$1, lnm=$2, email=$3, phone=$4, comment=$5 WHERE id=$6 RETURNING *",
       [fnm, lnm, email, phone, comment, id]
     );
+    console.log("User updated!");
     return res.status(200).json(updatedUser.rows[0]);
   } catch (error) {
     console.log(error);

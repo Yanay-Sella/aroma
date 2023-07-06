@@ -7,6 +7,8 @@ import {
   faTrashCan,
   faFloppyDisk,
   faXmark,
+  faHourglass,
+  faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
 const User = ({ userInfo, setUsersArr }) => {
@@ -23,6 +25,11 @@ const User = ({ userInfo, setUsersArr }) => {
   const [lnmValid, setLnmValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
   const [phoneValid, setPhoneValid] = useState(true);
+
+  const [isLoading, setIsloading] = useState(false);
+  const [fail, setFail] = useState(false);
+
+  const [failMsg, setFailMsg] = useState("error");
 
   const { fnm, lnm, email, phone, comment, id } = originalUser; //original user
 
@@ -45,6 +52,12 @@ const User = ({ userInfo, setUsersArr }) => {
       uPhone: phone,
       uComment: comment,
     });
+    setFail(false);
+    setIsloading(false);
+    setFnmValid(true);
+    setLnmValid(true);
+    setEmailValid(true);
+    setPhoneValid(true);
   }, [isEdit]);
 
   const type = (e) => {
@@ -91,29 +104,61 @@ const User = ({ userInfo, setUsersArr }) => {
     if (unvalid) return;
 
     try {
+      setIsloading(true);
       const response = await axios.put(`${serverUrl}/user/edit`, {
         ...newUser,
         id,
       });
       if (response.status === 200) {
-        setIsEdit(false);
+        setTimeout(() => {
+          setIsEdit(false);
+          setIsloading(false);
+        }, 1500);
         setOriginalUser(response.data);
       }
-      console.log(response);
     } catch (error) {
-      console.log(error);
+      const { response } = error;
+      //conflict
+      if (response.status === 409) {
+        const { conflict } = response.data;
+        setTimeout(() => {
+          switch (conflict) {
+            case "e":
+              {
+                setEmailValid(false);
+                setFailMsg(`email already in use...`);
+              }
+              break;
+            case "p":
+              {
+                setPhoneValid(false);
+                setFailMsg(`phone already in use...`);
+              }
+              break;
+            case "ep":
+              {
+                setEmailValid(false);
+                setPhoneValid(false);
+                setFailMsg(`email & phone already in use`);
+              }
+              break;
+          }
+          setFail(true);
+          setIsloading(false);
+        }, 1500);
+      }
     }
   };
 
   return (
-    <div className="relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider">
+    <div className="relative border-2 rounded-md w-96 p-3 transition-all hover:scale-105 tracking-wider bg-gray-950 bg-opacity-95">
       {isEdit ? (
         <form className="flex flex-col items-start gap-2">
-          <div className="flex gap-3 mb-2">
-            <span>
-              <p>{`First name: `}</p>
+          <span className="flex gap-3 mb-2 self-center">
+            <span className="flex flex-col">
+              <p className={`text-red-600`}>{`First name: `}</p>
               <input
-                className={`tracking-wider border-0 border-b-2 rounded-md bg-gray-900 bg-opacity-50 h-7 pl-1 ${
+                className={`tracking-wider border-0 border-b-2 rounded-t-md bg-gray-900 bg-opacity-50 h-7 ${
                   fnmValid ? "border-gray-600" : "border-red-600"
                 }`}
                 type="text"
@@ -123,10 +168,10 @@ const User = ({ userInfo, setUsersArr }) => {
                 onChange={type}
               />
             </span>
-            <span>
-              <p>{`Last name: `}</p>
+            <span className="flex flex-col">
+              <p className={`text-red-600`}>{`Last name: `}</p>
               <input
-                className={`tracking-wider border-0 border-b-2 rounded-md bg-gray-900 bg-opacity-50 h-7 pl-1 ${
+                className={`tracking-wider border-0 border-b-2 rounded-t-md bg-gray-900 bg-opacity-50 h-7 ${
                   lnmValid ? "border-gray-600" : "border-red-600"
                 }`}
                 type="text"
@@ -136,11 +181,11 @@ const User = ({ userInfo, setUsersArr }) => {
                 onChange={type}
               />
             </span>
-          </div>
+          </span>
           <span className="flex gap-2 self-stretch">
-            <p>{`Email: `}</p>
+            <p className={`text-red-600`}>{`Email: `}</p>
             <input
-              className={`tracking-wider border-0 border-b-2 rounded-md bg-gray-900 bg-opacity-50 h-5 pl-1 w-full ${
+              className={`tracking-wider border-0 border-b-2 rounded-t-md bg-gray-900 bg-opacity-50 h-5 pl-1 w-full ${
                 emailValid ? "border-gray-600" : "border-red-600"
               }`}
               type="text"
@@ -151,9 +196,9 @@ const User = ({ userInfo, setUsersArr }) => {
             />
           </span>
           <span className="flex gap-2 self-stretch">
-            <p>{`Phone: `}</p>
+            <p className={`text-red-600`}>{`Phone: `}</p>
             <input
-              className={`tracking-wider border-0 border-b-2 rounded-md bg-gray-900 bg-opacity-50 h-5 pl-1 w-full ${
+              className={`tracking-wider border-0 border-b-2 rounded-t-md bg-gray-900 bg-opacity-50 h-5 pl-1 w-full ${
                 phoneValid ? "border-gray-600" : "border-red-600"
               }`}
               type="text"
@@ -164,9 +209,9 @@ const User = ({ userInfo, setUsersArr }) => {
             />
           </span>
           <span className="flex flex-col gap-2">
-            <p>{`Comment: `}</p>
+            <p className={`text-red-600`}>{`Comment: `}</p>
             <textarea
-              className={`tracking-wider border-0 border-b-2 rounded-md bg-gray-900 bg-opacity-50 pl-1 w-64 border-gray-600`}
+              className={`tracking-wider border-2 rounded-md bg-gray-900 bg-opacity-50 pl-1 w-64 border-gray-600`}
               type="text"
               placeholder="comment"
               name="uComment"
@@ -174,40 +219,66 @@ const User = ({ userInfo, setUsersArr }) => {
               onChange={type}
             />
           </span>
+          {fail && (
+            <div className="flex gap-2 items-end text-red-600">
+              <p className="text-red-600">
+                <FontAwesomeIcon icon={faCircleExclamation} /> {"    "}
+                {failMsg}
+              </p>
+            </div>
+          )}
         </form>
       ) : (
-        <div>
-          <p className="text-3xl text-red-600">{`${fnm} ${lnm}`}</p>
-          <p>{`Email: ${email}`}</p>
-          <p>{`Phone number: ${phone}`}</p>
-          <p>{`Comment: ${comment}`}</p>
+        <div className="w-72 flex flex-col gap-1">
+          <p className="text-3xl text-red-600 mb-1">{`${fnm} ${lnm}`}</p>
+          <div className="flex gap-2">
+            <p className="text-red-600 ">{"Email:"}</p>
+            <p>{`${email}`}</p>
+          </div>
+          <div className="flex gap-2">
+            <p className="text-red-600 ">{`Phone number:`}</p>
+            <p>{`${phone}`}</p>
+          </div>
+          <div>
+            <p className="text-red-600 ">{`Comment:`}</p>
+            <p>{`${comment}`}</p>
+          </div>
         </div>
       )}
-      <div className="absolute right-2 bottom-2 flex gap-2">
-        <div
-          className="hover:cursor-pointer text-white hover:bg-gray-900 rounded-full flex p-2"
-          onClick={() => {
-            isEdit ? setIsEdit(false) : setIsEdit(true);
-          }}
-        >
-          {isEdit ? (
-            <FontAwesomeIcon icon={faXmark} />
-          ) : (
-            <FontAwesomeIcon icon={faPencil} />
-          )}
-        </div>
-        <div
-          className="hover:cursor-pointer text-white hover:bg-gray-900 rounded-full flex p-2"
-          onClick={() => {
-            isEdit ? updateUser() : deleteUser();
-          }}
-        >
-          {isEdit ? (
-            <FontAwesomeIcon icon={faFloppyDisk} />
-          ) : (
-            <FontAwesomeIcon icon={faTrashCan} />
-          )}
-        </div>
+
+      <div className={`absolute bottom-2 ${isLoading ? "right-6" : "right-2"}`}>
+        {isLoading ? (
+          <div>
+            <FontAwesomeIcon icon={faHourglass} spin />
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <div
+              className="hover:cursor-pointer text-white hover:bg-gray-900 rounded-full flex p-2"
+              onClick={() => {
+                isEdit ? setIsEdit(false) : setIsEdit(true);
+              }}
+            >
+              {isEdit ? (
+                <FontAwesomeIcon icon={faXmark} />
+              ) : (
+                <FontAwesomeIcon icon={faPencil} />
+              )}
+            </div>
+            <div
+              className="hover:cursor-pointer text-white hover:bg-gray-900 rounded-full flex p-2"
+              onClick={() => {
+                isEdit ? updateUser() : deleteUser();
+              }}
+            >
+              {isEdit ? (
+                <FontAwesomeIcon icon={faFloppyDisk} />
+              ) : (
+                <FontAwesomeIcon icon={faTrashCan} />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

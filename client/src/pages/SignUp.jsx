@@ -11,7 +11,6 @@ import {
   faUser,
   faHourglass,
   faCircleCheck,
-  faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SignUp = () => {
@@ -76,7 +75,6 @@ const SignUp = () => {
     if (unvalid) return;
 
     try {
-      //signing up the user
       setIsloading(true);
       const response = await axios.post(`${serverUrl}/user/signup`, userData);
       console.log(response);
@@ -171,7 +169,7 @@ const SignUp = () => {
           valid={phoneValid}
         />
         <textarea
-          className="bg-gray-900 rounded-md p-1 px-3 text-white"
+          className="bg-gray-900 bg-opacity-60 rounded-md p-1 px-3 text-white"
           type="text"
           placeholder="comment"
           name="comment"
@@ -194,7 +192,7 @@ const SignUp = () => {
         ) : (
           <button
             onClick={onSubmit}
-            className="bg-gray-900 rounded-md w-fit self-center p-1 px-2 transition-all hover:scale-105 text-white tracking-wider"
+            className="bg-gray-900 bg-opacity-60 rounded-full w-fit self-center p-2 px-4 transition-all hover:scale-105 text-white tracking-wider"
           >
             Submit
           </button>
@@ -203,7 +201,7 @@ const SignUp = () => {
 
       <div className="flex gap-4 ">
         <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+          className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
           onClick={() => {
             navigate("/");
           }}
@@ -211,7 +209,7 @@ const SignUp = () => {
           <FontAwesomeIcon icon={faHouse} />
         </div>
         <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+          className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
           onClick={() => {
             navigate("/users");
           }}
@@ -226,7 +224,7 @@ const SignUp = () => {
 const Input = ({ placeholder, name, value, type, valid }) => {
   return (
     <input
-      className={`tracking-wider bg-gray-900 border-2 ${
+      className={`tracking-wider bg-gray-900 bg-opacity-60 border-2 ${
         !valid ? "border-red-600" : "border-transparent"
       } rounded-md p-1 px-3 text-white`}
       type="text"

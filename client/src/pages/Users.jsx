@@ -11,7 +11,7 @@ const Users = () => {
   const navigate = useNavigate();
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-  const [usersArr, setUsersArr] = useState([]);
+  const [usersArr, setUsersArr] = useState();
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -26,38 +26,43 @@ const Users = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-6 w-96">
-      <Logo />
-      <div className="flex gap-4 ">
-        <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <FontAwesomeIcon icon={faHouse} />
-        </div>
-        <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          onClick={() => {
-            navigate("/signup");
-          }}
-        >
-          <FontAwesomeIcon icon={faMugSaucer} />
-        </div>
-      </div>
+    <>
       {usersArr && (
-        <div className="flex flex-col gap-4 items-center width-full text-white fonty">
-          {usersArr.map((element) => {
-            const { fnm, lnm, email, phone, comment, id } = element;
-            console.log(element);
-            return (
-              <User userInfo={element} key={id} setUsersArr={setUsersArr} />
-            );
-          })}
+        <div className="flex flex-col items-center gap-6">
+          <Logo />
+          <div className="flex gap-4 ">
+            <div
+              className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              <FontAwesomeIcon icon={faHouse} />
+            </div>
+            <div
+              className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+              onClick={() => {
+                navigate("/signup");
+              }}
+            >
+              <FontAwesomeIcon icon={faMugSaucer} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6 width-full text-white fonty">
+            {usersArr.map((element) => {
+              return (
+                <User
+                  userInfo={element}
+                  key={element.id}
+                  setUsersArr={setUsersArr}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
