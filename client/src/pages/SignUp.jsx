@@ -6,7 +6,12 @@ import axios from "axios";
 import Logo from "../components/Logo.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHouse,
+  faUser,
+  faHourglass,
+  faCircleCheck,
+} from "@fortawesome/free-solid-svg-icons";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -21,6 +26,12 @@ const SignUp = () => {
   const [lnmValid, setLnmValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
   const [phoneValid, setPhoneValid] = useState(true);
+
+  const [isLoading, setIsloading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [fail, setFail] = useState(false);
+
+  const [failMsg, setFailMsg] = useState("error");
 
   const [userData, setUserData] = useState({
     fnm: "",
@@ -41,6 +52,8 @@ const SignUp = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    //validation
     let unvalid = false;
     if (!namePattern.test(fnm)) {
       setFnmValid(false);
@@ -62,19 +75,61 @@ const SignUp = () => {
     if (unvalid) return;
 
     try {
-      //signing up the user
+      setIsloading(true);
       const response = await axios.post(`${serverUrl}/user/signup`, userData);
       console.log(response);
-      if (response.status === 200)
-        setUserData({
-          fnm: "",
-          lnm: "",
-          email: "",
-          phone: "",
-          comment: "",
-        });
+      if (response.status === 200) {
+        setTimeout(() => {
+          setSuccess(true);
+        }, 1000);
+        setTimeout(() => {
+          setIsloading(false);
+          setSuccess(false);
+          setUserData({
+            fnm: "",
+            lnm: "",
+            email: "",
+            phone: "",
+            comment: "",
+          });
+        }, 2000);
+      }
     } catch (error) {
-      console.log(error);
+      const { response } = error;
+      console.log(response);
+      //conflict
+      if (response.status === 409) {
+        const { conflict } = response.data;
+
+        setTimeout(() => {
+          switch (conflict) {
+            case "e":
+              {
+                setEmailValid(false);
+                setFailMsg(`email already in use...`);
+              }
+              break;
+            case "p":
+              {
+                setPhoneValid(false);
+                setFailMsg(`phone already in use...`);
+              }
+              break;
+            case "ep":
+              {
+                setEmailValid(false);
+                setPhoneValid(false);
+                setFailMsg(`email & phone already in use`);
+              }
+              break;
+          }
+          setFail(true);
+        }, 1000);
+        setTimeout(() => {
+          setIsloading(false);
+          setFail(false);
+        }, 3000);
+      }
     }
   };
 
@@ -82,7 +137,7 @@ const SignUp = () => {
     <div className="flex flex-col items-center gap-6 w-96">
       <Logo />
 
-      <form className="flex flex-col gap-4 w-full border-2 rounded-lg p-3">
+      <form className="flex flex-col gap-4 w-full border-2 rounded-lg p-3 fonty">
         <h1 className="text-white fonty self-center text-3xl">Sign Up</h1>
 
         <Input
@@ -114,24 +169,39 @@ const SignUp = () => {
           valid={phoneValid}
         />
         <textarea
-          className="bg-gray-900 rounded-md p-1 px-3 text-white"
+          className="bg-gray-900 bg-opacity-60 rounded-md p-1 px-3 text-white"
           type="text"
           placeholder="comment"
           name="comment"
           onChange={type}
           value={comment}
         />
-        <button
-          onClick={onSubmit}
-          className="bg-gray-900 rounded-md w-fit self-center p-1 px-2 transition-all hover:scale-105 text-white"
-        >
-          Submit
-        </button>
+
+        {isLoading ? (
+          <div className="text-white text-xl self-center">
+            {success ? (
+              <FontAwesomeIcon icon={faCircleCheck} />
+            ) : fail ? (
+              <div className="flex flex-col">
+                <p className="text-red-600 fonty text-xl">{failMsg}</p>
+              </div>
+            ) : (
+              <FontAwesomeIcon icon={faHourglass} spin />
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={onSubmit}
+            className="bg-gray-900 bg-opacity-60 rounded-full w-fit self-center p-2 px-4 transition-all hover:scale-105 text-white tracking-wider"
+          >
+            Submit
+          </button>
+        )}
       </form>
 
       <div className="flex gap-4 ">
         <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+          className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
           onClick={() => {
             navigate("/");
           }}
@@ -139,7 +209,7 @@ const SignUp = () => {
           <FontAwesomeIcon icon={faHouse} />
         </div>
         <div
-          className="text-2xl border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
+          className="text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
           onClick={() => {
             navigate("/users");
           }}
@@ -154,7 +224,7 @@ const SignUp = () => {
 const Input = ({ placeholder, name, value, type, valid }) => {
   return (
     <input
-      className={`bg-gray-900 border-2 ${
+      className={`tracking-wider bg-gray-900 bg-opacity-60 border-2 ${
         !valid ? "border-red-600" : "border-transparent"
       } rounded-md p-1 px-3 text-white`}
       type="text"
