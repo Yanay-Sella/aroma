@@ -28,10 +28,10 @@ const handleSignUp = async (req, res) => {
   try {
     let { fnm, lnm, email, phone, comment } = req.body;
     email = email.toLowerCase();
-    console.log(validate(fnm, lnm, email, phone, comment));
     if (!validate(fnm, lnm, email, phone, comment)) {
       return res.status(400).json({ message: "input not valid" });
     }
+
     let existingUser;
     let conflict = "";
     //checking if user already exist

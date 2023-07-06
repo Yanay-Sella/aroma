@@ -52,7 +52,6 @@ const SignUp = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
     //validation
     let unvalid = false;
     if (!namePattern.test(fnm)) {
