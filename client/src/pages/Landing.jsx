@@ -4,7 +4,7 @@ import Logo from "../components/Logo.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMugSaucer, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Landing = () => {
   return (
@@ -27,17 +27,14 @@ const Landing = () => {
 };
 
 const MegaLink = ({ text, icon, to }) => {
-  const navigate = useNavigate();
   return (
-    <div
+    <Link
       className="hover:shadow-md hover:shadow-gray-600 border-2 bg-gray-950 bg-opacity-95 border-white rounded-md fonty text-white flex flex-col items-center gap-3 w-48 h-auto justify-between px-1 py-2 hover:cursor-pointer transition-all hover:scale-105"
-      onClick={() => {
-        navigate(to);
-      }}
+      to={to}
     >
       <p className="text-center text-6xl">{text}</p>
       <p className="text-center text-5xl">{icon}</p>
-    </div>
+    </Link>
   );
 };
 export default Landing;

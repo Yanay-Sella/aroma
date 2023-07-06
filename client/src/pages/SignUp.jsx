@@ -1,37 +1,25 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 import Logo from "../components/Logo.jsx";
+import useValidate from "../hooks/useValidate.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
   faUser,
   faHourglass,
-  faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SignUp = () => {
-  const navigate = useNavigate();
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-  //validation
-  const namePattern = /^[a-z]{1,10}$/i; //first and last
-  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  const phonePattern = /^0\d{9}$/;
-
-  const [fnmValid, setFnmValid] = useState(true);
-  const [lnmValid, setLnmValid] = useState(true);
-  const [emailValid, setEmailValid] = useState(true);
-  const [phoneValid, setPhoneValid] = useState(true);
-
   const [isLoading, setIsloading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [fail, setFail] = useState(false);
+  const [show, setShow] = useState(false);
 
-  const [failMsg, setFailMsg] = useState("error");
+  const [snackMsg, setSnackMsg] = useState("");
 
   const [userData, setUserData] = useState({
     fnm: "",
@@ -43,6 +31,24 @@ const SignUp = () => {
 
   const { fnm, lnm, email, phone, comment } = userData;
 
+  const {
+    fnmValid,
+    lnmValid,
+    emailValid,
+    phoneValid,
+    checkValidate,
+    setPhoneValid,
+    setEmailValid,
+  } = useValidate({ fnm, lnm, email, phone });
+
+  const showSnack = (message) => {
+    setSnackMsg(message);
+    setShow(true);
+    setTimeout(() => {
+      setShow(false);
+    }, 3000);
+  };
+
   const type = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => {
@@ -52,26 +58,14 @@ const SignUp = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    //validation
-    let unvalid = false;
-    if (!namePattern.test(fnm)) {
-      setFnmValid(false);
-      unvalid = true;
-    } else setFnmValid(true);
 
-    if (!namePattern.test(lnm)) {
-      setLnmValid(false);
-      unvalid = true;
-    } else setLnmValid(true);
-    if (!emailPattern.test(email)) {
-      setEmailValid(false);
-      unvalid = true;
-    } else setEmailValid(true);
-    if (!phonePattern.test(phone)) {
-      setPhoneValid(false);
-      unvalid = true;
-    } else setPhoneValid(true);
-    if (unvalid) return;
+    const valid = checkValidate();
+    console.log(valid);
+
+    if (!valid) {
+      showSnack("Input not valid");
+      return;
+    }
 
     try {
       setIsloading(true);
@@ -79,11 +73,8 @@ const SignUp = () => {
       console.log(response);
       if (response.status === 200) {
         setTimeout(() => {
-          setSuccess(true);
-        }, 1000);
-        setTimeout(() => {
           setIsloading(false);
-          setSuccess(false);
+          showSnack("User created");
           setUserData({
             fnm: "",
             lnm: "",
@@ -91,11 +82,10 @@ const SignUp = () => {
             phone: "",
             comment: "",
           });
-        }, 2000);
+        }, 1500);
       }
     } catch (error) {
       const { response } = error;
-      console.log(response);
       //conflict
       if (response.status === 409) {
         const { conflict } = response.data;
@@ -105,29 +95,25 @@ const SignUp = () => {
             case "e":
               {
                 setEmailValid(false);
-                setFailMsg(`email already in use...`);
+                showSnack(`email already in use...`);
               }
               break;
             case "p":
               {
                 setPhoneValid(false);
-                setFailMsg(`phone already in use...`);
+                showSnack(`phone already in use...`);
               }
               break;
             case "ep":
               {
                 setEmailValid(false);
                 setPhoneValid(false);
-                setFailMsg(`email & phone already in use`);
+                showSnack(`email & phone already in use`);
               }
               break;
           }
-          setFail(true);
-        }, 1000);
-        setTimeout(() => {
           setIsloading(false);
-          setFail(false);
-        }, 3000);
+        }, 1000);
       }
     }
   };
@@ -178,15 +164,7 @@ const SignUp = () => {
 
         {isLoading ? (
           <div className="text-white text-xl self-center">
-            {success ? (
-              <FontAwesomeIcon icon={faCircleCheck} />
-            ) : fail ? (
-              <div className="flex flex-col">
-                <p className="text-red-600 fonty text-xl">{failMsg}</p>
-              </div>
-            ) : (
-              <FontAwesomeIcon icon={faHourglass} spin />
-            )}
+            <FontAwesomeIcon icon={faHourglass} spin />
           </div>
         ) : (
           <button
@@ -199,22 +177,25 @@ const SignUp = () => {
       </form>
 
       <div className="flex gap-4 ">
-        <div
+        <Link
           className="hover:shadow-md hover:shadow-gray-600 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          onClick={() => {
-            navigate("/");
-          }}
+          to="/"
         >
           <FontAwesomeIcon icon={faHouse} />
-        </div>
-        <div
+        </Link>
+        <Link
           className="hover:shadow-md hover:shadow-gray-600 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          onClick={() => {
-            navigate("/users");
-          }}
+          to="/users"
         >
           <FontAwesomeIcon icon={faUser} />
-        </div>
+        </Link>
+      </div>
+      <div
+        className={`snackbar fonty justify-self-center rounded-lg bg-gray-900 px-5 py-3 text-red-600 text-xl ${
+          show && "snackbarshow"
+        }`}
+      >
+        <p>{snackMsg}</p>
       </div>
     </div>
   );

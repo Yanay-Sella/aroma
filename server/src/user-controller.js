@@ -1,18 +1,6 @@
 const pool = require("./database/db.js");
 
-const validate = (fnm, lnm, email, phone, comment) => {
-  const namePattern = /^[a-z]{1,10}$/i; //first and last
-  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  const phonePattern = /^0\d{9}$/;
-
-  if (!namePattern.test(fnm) || !namePattern.test(lnm)) return false;
-  if (!emailPattern.test(email)) return false;
-  if (!phonePattern.test(phone)) return false;
-  if (typeof comment !== "string") return false;
-
-  console.log("Validation passed");
-  return true;
-};
+const { validate, checkConflict } = require("./commonFunctions.js");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -28,28 +16,12 @@ const handleSignUp = async (req, res) => {
   try {
     let { fnm, lnm, email, phone, comment } = req.body;
     email = email.toLowerCase();
+
     if (!validate(fnm, lnm, email, phone, comment)) {
       return res.status(400).json({ message: "input not valid" });
     }
 
-    let existingUser;
-    let conflict = "";
-    //checking if user already exist
-    existingUser = await pool.query("SELECT * FROM users WHERE (email=$1)", [
-      email,
-    ]);
-    existingUser = existingUser.rows[0];
-    if (existingUser) {
-      conflict = "e"; //email conflict
-    }
-    existingUser = await pool.query("SELECT * FROM users WHERE (phone=$1)", [
-      phone,
-    ]);
-    existingUser = existingUser.rows[0];
-    if (existingUser) {
-      conflict = conflict + "p"; //phone conflict
-    }
-
+    const conflict = await checkConflict(email, phone);
     if (conflict !== "")
       return res.status(409).json({ message: "conflict", conflict });
 
@@ -61,20 +33,6 @@ const handleSignUp = async (req, res) => {
     return res.status(200).json(newUser.rows[0]);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "server error" });
-  }
-};
-
-const handleDelete = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const deletedUser = await pool.query(
-      "DELETE FROM users WHERE email=$1 RETURNING *",
-      [email]
-    );
-    console.log("User deleted");
-    return res.status(200).json(deletedUser.rows[0]);
-  } catch (error) {
     return res.status(500).json({ message: "server error" });
   }
 };
@@ -91,29 +49,11 @@ const handleEdit = async (req, res) => {
       id,
     } = newUser;
     email = email.toLowerCase();
+
     if (!validate(fnm, lnm, email, phone, comment))
       return res.status(400).json({ message: "input not valid" });
 
-    let existingUser;
-    let conflict = "";
-    //checking if user already exist
-    existingUser = await pool.query(
-      "SELECT * FROM users WHERE (email=$1 AND id!=$2)",
-      [email, id]
-    );
-    existingUser = existingUser.rows[0];
-    if (existingUser) {
-      conflict = "e"; //email conflict
-    }
-    existingUser = await pool.query(
-      "SELECT * FROM users WHERE (phone=$1 AND id!=$2)",
-      [phone, id]
-    );
-    existingUser = existingUser.rows[0];
-    if (existingUser) {
-      conflict = conflict + "p"; //phone conflict
-    }
-
+    const conflict = await checkConflict(email, phone, id);
     if (conflict !== "")
       return res.status(409).json({ message: "conflict", conflict });
 
@@ -125,6 +65,20 @@ const handleEdit = async (req, res) => {
     return res.status(200).json(updatedUser.rows[0]);
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const handleDelete = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const deletedUser = await pool.query(
+      "DELETE FROM users WHERE email=$1 RETURNING *",
+      [email]
+    );
+    console.log("User deleted");
+    return res.status(200).json(deletedUser.rows[0]);
+  } catch (error) {
     return res.status(500).json({ message: "server error" });
   }
 };
