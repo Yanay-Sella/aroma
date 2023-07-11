@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Checkbox from "../components/Checkbox.jsx";
 
 import Logo from "../components/Logo.jsx";
 import useValidate from "../hooks/useValidate.jsx";
@@ -26,20 +27,25 @@ const SignUp = () => {
     lnm: "",
     email: "",
     phone: "",
+    branch: "",
     comment: "",
   });
 
-  const { fnm, lnm, email, phone, comment } = userData;
+  const [favList, setFavList] = useState([]);
+
+  const { fnm, lnm, email, phone, comment, branch } = userData;
 
   const {
     fnmValid,
     lnmValid,
     emailValid,
     phoneValid,
+    branchValid,
     checkValidate,
     setPhoneValid,
     setEmailValid,
-  } = useValidate({ fnm, lnm, email, phone });
+    setBranchValid,
+  } = useValidate({ fnm, lnm, email, phone, branch });
 
   const showSnack = (message) => {
     setSnackMsg(message);
@@ -60,7 +66,6 @@ const SignUp = () => {
     e.preventDefault();
 
     const valid = checkValidate();
-    console.log(valid);
 
     if (!valid) {
       showSnack("Input not valid");
@@ -69,7 +74,10 @@ const SignUp = () => {
 
     try {
       setIsloading(true);
-      const response = await axios.post(`${serverUrl}/user/signup`, userData);
+      const response = await axios.post(`${serverUrl}/user/signup`, {
+        ...userData,
+        favList,
+      });
       console.log(response);
       if (response.status === 200) {
         setTimeout(() => {
@@ -81,6 +89,7 @@ const SignUp = () => {
             email: "",
             phone: "",
             comment: "",
+            branch: "",
           });
         }, 1500);
       }
@@ -114,7 +123,7 @@ const SignUp = () => {
           }
           setIsloading(false);
         }, 1000);
-      }
+      } else setIsloading(false);
     }
   };
 
@@ -153,6 +162,13 @@ const SignUp = () => {
           type={type}
           valid={phoneValid}
         />
+        <Input
+          placeholder="branch"
+          name="branch"
+          value={branch}
+          type={type}
+          valid={branchValid}
+        />
         <textarea
           className="bg-gray-900 bg-opacity-60 rounded-md p-1 px-3 text-white"
           type="text"
@@ -161,6 +177,16 @@ const SignUp = () => {
           onChange={type}
           value={comment}
         />
+        <h1 className="text-red-600 text-xl">{"Favorite foods or drinks"}</h1>
+        <div className="text-white grid grid-cols-2">
+          <Checkbox name="Coffee" setFavList={setFavList} />
+          <Checkbox name="Sandwich" setFavList={setFavList} />
+          <Checkbox name="Croissant" setFavList={setFavList} />
+          <Checkbox name="Tea" setFavList={setFavList} />
+          <Checkbox name="Cookies" setFavList={setFavList} />
+          <Checkbox name="Eggs" setFavList={setFavList} />
+          <Checkbox name="Bread" setFavList={setFavList} />
+        </div>
 
         {isLoading ? (
           <div className="text-white text-xl self-center">
@@ -176,6 +202,7 @@ const SignUp = () => {
         )}
       </form>
 
+      {/* links to other pages */}
       <div className="flex gap-4 ">
         <Link
           className="hover:shadow-md hover:shadow-gray-600 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"

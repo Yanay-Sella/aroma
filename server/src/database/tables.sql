@@ -1,5 +1,5 @@
 CREATE TABLE users(
-    userId SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     fnm varchar(10) not null,
     lnm varchar(10) not null,
     email varchar(30) UNIQUE,
@@ -22,5 +22,7 @@ CREATE TABLE foods(
 );
 
 CREATE TABLE loves(
-    
+    food varchar(10) REFERENCES foods(fName),
+    userE varchar(30) REFERENCES users(email),
+    PRIMARY KEY (food, userE)
 );

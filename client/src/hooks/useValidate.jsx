@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const useValidate = ({ fnm, lnm, email, phone }) => {
+const useValidate = ({ fnm, lnm, email, phone, branch }) => {
   //validation
   const namePattern = /^[a-z]{1,10}$/i; //first and last
   const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -10,9 +10,9 @@ const useValidate = ({ fnm, lnm, email, phone }) => {
   const [lnmValid, setLnmValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
   const [phoneValid, setPhoneValid] = useState(true);
+  const [branchValid, setBranchValid] = useState(true);
 
   const checkValidate = () => {
-    console.log(email);
     //validation
     let unvalid = false;
     if (!namePattern.test(fnm)) {
@@ -24,14 +24,21 @@ const useValidate = ({ fnm, lnm, email, phone }) => {
       setLnmValid(false);
       unvalid = true;
     } else setLnmValid(true);
+
     if (!emailPattern.test(email)) {
       setEmailValid(false);
       unvalid = true;
     } else setEmailValid(true);
+
     if (!phonePattern.test(phone)) {
       setPhoneValid(false);
       unvalid = true;
     } else setPhoneValid(true);
+
+    if (!namePattern.test(branch)) {
+      setBranchValid(false);
+      unvalid = true;
+    } else setBranchValid(true);
 
     return !unvalid;
   };
@@ -42,9 +49,11 @@ const useValidate = ({ fnm, lnm, email, phone }) => {
     lnmValid,
     emailValid,
     phoneValid,
+    branchValid,
     checkValidate,
     setPhoneValid,
     setEmailValid,
+    setBranchValid,
   };
 };
 
