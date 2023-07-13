@@ -32,18 +32,19 @@ const handleSignUp = async (req, res) => {
       [fnm, lnm, email, phone, branch, comment]
     );
 
+    newUser = newUser.rows[0];
+    console.log(newUser);
     let newFav;
     await Promise.all(
       favList.map(async (element) => {
         const food = element.toLowerCase();
         newFav = await pool.query(
-          "INSERT INTO loves (food, userE) values ($1, $2) RETURNING *",
-          [food, email]
+          "INSERT INTO loves (food, userId) values ($1, $2) RETURNING *",
+          [food, newUser.id]
         );
       })
     );
     console.log("User added");
-    newUser = newUser.rows[0];
     newFav = newFav.rows[0];
     return res.status(200).json({ newUser, newFav });
   } catch (error) {
@@ -87,6 +88,7 @@ const handleEdit = async (req, res) => {
 const handleDelete = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log(email);
     const deletedUser = await pool.query(
       "DELETE FROM users WHERE email=$1 RETURNING *",
       [email]
@@ -94,6 +96,7 @@ const handleDelete = async (req, res) => {
     console.log("User deleted");
     return res.status(200).json(deletedUser.rows[0]);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "server error" });
   }
 };

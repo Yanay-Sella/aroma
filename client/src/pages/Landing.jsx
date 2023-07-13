@@ -3,7 +3,11 @@ import React from "react";
 import Logo from "../components/Logo.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMugSaucer, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMugSaucer,
+  faUser,
+  faSitemap,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 const Landing = () => {
@@ -14,12 +18,17 @@ const Landing = () => {
         <MegaLink
           text="Sign Up"
           icon={<FontAwesomeIcon icon={faMugSaucer} />}
-          to="/signup"
+          to="signup"
         />
         <MegaLink
           text="View Users"
           icon={<FontAwesomeIcon icon={faUser} />}
           to="users"
+        />
+        <MegaLink
+          text="View Data"
+          icon={<FontAwesomeIcon icon={faSitemap} />}
+          to="data"
         />
       </div>
     </div>

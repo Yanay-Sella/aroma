@@ -23,6 +23,7 @@ CREATE TABLE foods(
 
 CREATE TABLE loves(
     food varchar(10) REFERENCES foods(fName),
-    userE varchar(30) REFERENCES users(email),
-    PRIMARY KEY (food, userE)
+    userId INT,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (food, userId)
 );

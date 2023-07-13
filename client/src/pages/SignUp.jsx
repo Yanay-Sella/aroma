@@ -33,6 +33,10 @@ const SignUp = () => {
 
   const [favList, setFavList] = useState([]);
 
+  useEffect(() => {
+    console.log(favList);
+  }, [favList]);
+
   const { fnm, lnm, email, phone, comment, branch } = userData;
 
   const {
@@ -91,6 +95,7 @@ const SignUp = () => {
             comment: "",
             branch: "",
           });
+          setFavList([]);
         }, 1500);
       }
     } catch (error) {
@@ -179,13 +184,17 @@ const SignUp = () => {
         />
         <h1 className="text-red-600 text-xl">{"Favorite foods or drinks"}</h1>
         <div className="text-white grid grid-cols-2">
-          <Checkbox name="Coffee" setFavList={setFavList} />
-          <Checkbox name="Sandwich" setFavList={setFavList} />
-          <Checkbox name="Croissant" setFavList={setFavList} />
-          <Checkbox name="Tea" setFavList={setFavList} />
-          <Checkbox name="Cookies" setFavList={setFavList} />
-          <Checkbox name="Eggs" setFavList={setFavList} />
-          <Checkbox name="Bread" setFavList={setFavList} />
+          <Checkbox name="Coffee" setFavList={setFavList} favList={favList} />
+          <Checkbox name="Sandwich" setFavList={setFavList} favList={favList} />
+          <Checkbox
+            name="Croissant"
+            setFavList={setFavList}
+            favList={favList}
+          />
+          <Checkbox name="Tea" setFavList={setFavList} favList={favList} />
+          <Checkbox name="Cookie" setFavList={setFavList} favList={favList} />
+          <Checkbox name="Eggs" setFavList={setFavList} favList={favList} />
+          <Checkbox name="Bread" setFavList={setFavList} favList={favList} />
         </div>
 
         {isLoading ? (
