@@ -12,6 +12,16 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getAllBranches = async (req, res) => {
+  try {
+    const allBranches = await pool.query("SELECT * FROM branches");
+    return res.status(200).json(allBranches.rows);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
 const handleSignUp = async (req, res) => {
   try {
     let { fnm, lnm, email, phone, comment, branch, favList } = req.body;
@@ -101,4 +111,10 @@ const handleDelete = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, handleDelete, handleEdit, handleSignUp };
+module.exports = {
+  getAllUsers,
+  handleDelete,
+  handleEdit,
+  handleSignUp,
+  getAllBranches,
+};

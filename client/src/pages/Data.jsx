@@ -11,6 +11,7 @@ const Users = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
   const [usersArr, setUsersArr] = useState();
+  const [branchesArr, setBranchesArr] = useState();
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -22,6 +23,17 @@ const Users = () => {
       }
     };
     getAllUsers();
+
+    const getAllBranches = async () => {
+      try {
+        const response = await axios.get(`${serverUrl}/user/branches`);
+        setBranchesArr(response.data);
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllBranches();
   }, []);
 
   //   var toggler = document.getElementsByClassName("caret");
@@ -35,8 +47,6 @@ const Users = () => {
   //     this.parentElement.querySelector(".nested").classList.toggle("active");
   //     this.classList.toggle("caret-down");
   //   };
-
-  console.log(usersArr);
 
   return (
     <div>
