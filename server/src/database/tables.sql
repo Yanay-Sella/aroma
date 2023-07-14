@@ -1,3 +1,19 @@
+-- need to create the table in the following order
+
+CREATE TABLE countries(
+    cName varchar(10) PRIMARY KEY
+);
+
+
+CREATE TABLE branches(
+    bName varchar(10) PRIMARY KEY,
+    country varchar(10) REFERENCES countries(cName)
+);
+
+CREATE TABLE foods(
+    fName varchar(10) PRIMARY KEY
+);
+
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     fnm varchar(10) not null,
@@ -6,19 +22,6 @@ CREATE TABLE users(
     phone varchar(10) UNIQUE,
     comment varchar(200) not null,
     branch varchar(10) REFERENCES branches(bName)
-);
-
-CREATE TABLE branches(
-    bName varchar(10) PRIMARY KEY,
-    country varchar(10) REFERENCES countries(cName)
-);
-
-CREATE TABLE countries(
-    cName varchar(10) PRIMARY KEY
-);
-
-CREATE TABLE foods(
-    fName varchar(10) PRIMARY KEY
 );
 
 CREATE TABLE loves(

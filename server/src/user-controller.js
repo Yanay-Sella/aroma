@@ -1,11 +1,51 @@
 const pool = require("./database/db.js");
 
 const { validate, checkConflict } = require("./commonFunctions.js");
+const { all } = require("axios");
 
 const getAllUsers = async (req, res) => {
   try {
     const allUsers = await pool.query("SELECT * FROM users ORDER BY id");
     return res.status(200).json(allUsers.rows);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const getAllBranches = async (req, res) => {
+  try {
+    let allBranches = await pool.query("SELECT * FROM branches");
+    let loves = await pool.query(
+      "SELECT fnm, food, branch FROM users, loves WHERE userId=id"
+    );
+    let allUsers = await pool.query("SELECT * FROM users ORDER BY id");
+
+    allBranches = allBranches.rows;
+    loves = loves.rows;
+    allUsers = allUsers.rows;
+
+    allUsers = allUsers.map((user) => {
+      let favFoods = loves.filter((love) => love.fnm === user.fnm);
+      favFoods = favFoods.map((food) => food.food);
+      return { ...user, favFoods };
+    });
+
+    allBranches = allBranches.map((e) => {
+      const bUsers = allUsers.filter((user) => user.branch === e.bname);
+      return { ...e, users: bUsers };
+    });
+
+    let countries = allBranches.map((e) => e.country);
+    countries = [...new Set(countries)];
+    countries = countries.map((country) => {
+      let cBranches = allBranches.filter(
+        (branch) => branch.country === country
+      );
+      return { name: country, branches: cBranches };
+    });
+
+    return res.status(200).json({ allBranches, countries });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "server error" });
@@ -101,4 +141,10 @@ const handleDelete = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, handleDelete, handleEdit, handleSignUp };
+module.exports = {
+  getAllUsers,
+  handleDelete,
+  handleEdit,
+  handleSignUp,
+  getAllBranches,
+};

@@ -88,10 +88,10 @@ code {
 }
 
 /* Remove default bullets */
-ul,
+/* ul,
 #myUL {
   list-style-type: none;
-}
+} */
 
 /* Remove margins and padding from the parent ul */
 #myUL {
