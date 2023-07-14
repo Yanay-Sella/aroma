@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const Landing = () => {
   return (
-    <div className="flex flex-col items-center gap-6 w-96">
+    <div className="flex flex-col items-center gap-48 w-96 h-screen justify-stretch">
       <Logo />
       <div className="flex gap-10">
         <MegaLink
@@ -38,7 +38,7 @@ const Landing = () => {
 const MegaLink = ({ text, icon, to }) => {
   return (
     <Link
-      className="hover:shadow-md hover:shadow-gray-600 border-2 bg-gray-950 bg-opacity-95 border-white rounded-md fonty text-white flex flex-col items-center gap-3 w-48 h-auto justify-between px-1 py-2 hover:cursor-pointer transition-all hover:scale-105"
+      className=" justify-self-center hover:shadow-md hover:shadow-gray-600 border-2 bg-gray-950 bg-opacity-95 border-white rounded-md fonty text-white flex flex-col items-center gap-3 w-48 h-52 justify-between px-1 py-2 hover:cursor-pointer transition-all hover:scale-105"
       to={to}
     >
       <p className="text-center text-6xl">{text}</p>
