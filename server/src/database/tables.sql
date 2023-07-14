@@ -1,5 +1,5 @@
 CREATE TABLE users(
-    userId SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     fnm varchar(10) not null,
     lnm varchar(10) not null,
     email varchar(30) UNIQUE,
@@ -22,5 +22,8 @@ CREATE TABLE foods(
 );
 
 CREATE TABLE loves(
-    
+    food varchar(10) REFERENCES foods(fName),
+    userId INT,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (food, userId)
 );

@@ -1,8 +1,11 @@
 import "./App.css";
 import Page from "./Page";
+
 import Landing from "./pages/Landing.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import Users from "./pages/Users.jsx";
+import Data from "./pages/Data.jsx";
+
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 
 function App() {
@@ -12,6 +15,8 @@ function App() {
         <Route path="/" element={<Page children={<Landing />} />} />
         <Route path="/signup" element={<Page children={<SignUp />} />} />
         <Route path="/users" element={<Page children={<Users />} />} />
+        <Route path="/data" element={<Page children={<Data />} />} />
+
         <Route path="*" element={<Navigate to="/signup" replace />} />
       </Routes>
     </BrowserRouter>

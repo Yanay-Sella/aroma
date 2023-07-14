@@ -1,6 +1,6 @@
 const pool = require("./database/db.js");
 
-const validate = (fnm, lnm, email, phone, comment) => {
+const validate = (fnm, lnm, email, phone, comment, branch) => {
   const namePattern = /^[a-z]{1,10}$/i; //first and last
   const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   const phonePattern = /^0\d{9}$/;
@@ -8,6 +8,8 @@ const validate = (fnm, lnm, email, phone, comment) => {
   if (!namePattern.test(fnm) || !namePattern.test(lnm)) return false;
   if (!emailPattern.test(email)) return false;
   if (!phonePattern.test(phone)) return false;
+  if (!namePattern.test(branch)) return false;
+
   if (typeof comment !== "string") return false;
 
   console.log("Validation passed");

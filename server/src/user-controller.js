@@ -14,10 +14,11 @@ const getAllUsers = async (req, res) => {
 
 const handleSignUp = async (req, res) => {
   try {
-    let { fnm, lnm, email, phone, comment } = req.body;
+    let { fnm, lnm, email, phone, comment, branch, favList } = req.body;
+    console.log(req.body);
     email = email.toLowerCase();
 
-    if (!validate(fnm, lnm, email, phone, comment)) {
+    if (!validate(fnm, lnm, email, phone, comment, branch)) {
       return res.status(400).json({ message: "input not valid" });
     }
 
@@ -25,12 +26,27 @@ const handleSignUp = async (req, res) => {
     if (conflict !== "")
       return res.status(409).json({ message: "conflict", conflict });
 
-    const newUser = await pool.query(
-      "INSERT INTO users (fnm, lnm, email, phone, comment) values ($1, $2, $3, $4, $5) RETURNING *",
-      [fnm, lnm, email, phone, comment]
+    let newUser;
+    newUser = await pool.query(
+      "INSERT INTO users (fnm, lnm, email, phone, branch, comment) values ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [fnm, lnm, email, phone, branch, comment]
+    );
+
+    newUser = newUser.rows[0];
+    console.log(newUser);
+    let newFav;
+    await Promise.all(
+      favList.map(async (element) => {
+        const food = element.toLowerCase();
+        newFav = await pool.query(
+          "INSERT INTO loves (food, userId) values ($1, $2) RETURNING *",
+          [food, newUser.id]
+        );
+      })
     );
     console.log("User added");
-    return res.status(200).json(newUser.rows[0]);
+    newFav = newFav.rows[0];
+    return res.status(200).json({ newUser, newFav });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "server error" });
@@ -72,6 +88,7 @@ const handleEdit = async (req, res) => {
 const handleDelete = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log(email);
     const deletedUser = await pool.query(
       "DELETE FROM users WHERE email=$1 RETURNING *",
       [email]
@@ -79,6 +96,7 @@ const handleDelete = async (req, res) => {
     console.log("User deleted");
     return res.status(200).json(deletedUser.rows[0]);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "server error" });
   }
 };
