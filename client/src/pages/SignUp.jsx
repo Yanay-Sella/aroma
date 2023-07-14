@@ -13,6 +13,7 @@ import {
   faUser,
   faHourglass,
 } from "@fortawesome/free-solid-svg-icons";
+import Circlink from "../components/Circlink.jsx";
 
 const SignUp = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
@@ -33,10 +34,6 @@ const SignUp = () => {
 
   const [favList, setFavList] = useState([]);
 
-  useEffect(() => {
-    console.log(favList);
-  }, [favList]);
-
   const { fnm, lnm, email, phone, comment, branch } = userData;
 
   const {
@@ -44,11 +41,9 @@ const SignUp = () => {
     lnmValid,
     emailValid,
     phoneValid,
-    branchValid,
     checkValidate,
     setPhoneValid,
     setEmailValid,
-    setBranchValid,
   } = useValidate({ fnm, lnm, email, phone, branch });
 
   const showSnack = (message) => {
@@ -167,13 +162,7 @@ const SignUp = () => {
           type={type}
           valid={phoneValid}
         />
-        <Input
-          placeholder="branch"
-          name="branch"
-          value={branch}
-          type={type}
-          valid={branchValid}
-        />
+
         <textarea
           className="bg-gray-900 bg-opacity-60 rounded-md p-1 px-3 text-white"
           type="text"
@@ -182,6 +171,51 @@ const SignUp = () => {
           onChange={type}
           value={comment}
         />
+
+        <div className="flex flex-col gap-1">
+          <label className="text-red-600 text-lg" htmlFor="branch">
+            Choose a branch:
+          </label>
+          <select
+            className={`tracking-wider bg-gray-900 bg-opacity-60 border-2 text-white rounded-md p-1 px-2 border-transparent`}
+            name="branch"
+            id="branch"
+            value={branch}
+            onChange={type}
+          >
+            <option className="text-gray-900" value="telAviv">
+              telAviv
+            </option>
+            <option className="text-gray-900" value="rishon">
+              rishon
+            </option>
+            <option className="text-gray-900" value="holon">
+              holon
+            </option>
+            <option className="text-gray-900" value="newYork">
+              newYork
+            </option>
+            <option className="text-gray-900" value="california">
+              california
+            </option>
+            <option className="text-gray-900" value="texas">
+              texas
+            </option>
+            <option className="text-gray-900" value="ohio">
+              ohio
+            </option>
+            <option className="text-gray-900" value="munich">
+              munich
+            </option>
+            <option className="text-gray-900" value="berlin">
+              berlin
+            </option>
+            <option className="text-gray-900" value="budapest">
+              budapest
+            </option>
+          </select>
+        </div>
+
         <h1 className="text-red-600 text-xl">{"Favorite foods or drinks"}</h1>
         <div className="text-white grid grid-cols-2">
           <Checkbox name="Coffee" setFavList={setFavList} favList={favList} />
@@ -213,18 +247,8 @@ const SignUp = () => {
 
       {/* links to other pages */}
       <div className="flex gap-4 ">
-        <Link
-          className="hover:shadow-md hover:shadow-gray-600 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          to="/"
-        >
-          <FontAwesomeIcon icon={faHouse} />
-        </Link>
-        <Link
-          className="hover:shadow-md hover:shadow-gray-600 text-2xl bg-gray-950 bg-opacity-95 border-2 rounded-full transition-all hover:scale-105 hover:cursor-pointer text-white p-3 flex"
-          to="/users"
-        >
-          <FontAwesomeIcon icon={faUser} />
-        </Link>
+        <Circlink to="/" icon={faHouse} />
+        <Circlink to="/users" icon={faUser} />
       </div>
       <div
         className={`snackbar fonty justify-self-center rounded-lg bg-gray-900 px-5 py-3 text-red-600 text-xl ${

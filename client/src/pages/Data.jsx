@@ -2,33 +2,19 @@ import React from "react";
 import Logo from "../components/Logo.jsx";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import User from "../components/User.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faMugSaucer } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import Circlink from "../components/Circlink.jsx";
 
 const Users = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-  const [usersArr, setUsersArr] = useState();
-  const [branchesArr, setBranchesArr] = useState();
+  const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    const getAllUsers = async () => {
-      try {
-        const response = await axios.get(`${serverUrl}/user`);
-        setUsersArr(response.data); //array from db
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getAllUsers();
-
     const getAllBranches = async () => {
       try {
         const response = await axios.get(`${serverUrl}/user/branches`);
-        setBranchesArr(response.data);
-        console.log(response);
+        setCountries(response.data.countries);
       } catch (error) {
         console.log(error);
       }
@@ -36,40 +22,52 @@ const Users = () => {
     getAllBranches();
   }, []);
 
-  //   var toggler = document.getElementsByClassName("caret");
-  //   var i;
-
-  //   for (i = 0; i < toggler.length; i++) {
-  //     toggler[i].addEventListener("click");
-  //   }
-
-  //   const open = () => {
-  //     this.parentElement.querySelector(".nested").classList.toggle("active");
-  //     this.classList.toggle("caret-down");
-  //   };
-
   return (
     <div>
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6 w-96">
         <Logo />
-        <div className="text-white fonty text-2xl">
-          <ul id="myUL">
-            <li>
-              <Caret
-                title={"countries"}
-                children={
-                  <div>
-                    <Caret title={"israel"} />
-                    <Caret title={"israel"} />
-                    <Caret title={"israel"} />
-                    <Caret title={"israel"} />
-                    <Caret title={"israel"} />
-                  </div>
-                }
-              />
-            </li>
-          </ul>
-        </div>
+        <Circlink to="/" icon={faHouse} />
+        {countries && (
+          <div className="text-white fonty text-2xl w-96 p-2 border-2 border-white rounded-md">
+            <ul id="myUL">
+              <li>
+                <Caret
+                  title={"countries"}
+                  children={
+                    <div>
+                      {countries.map((country) => (
+                        <Caret
+                          key={country.name}
+                          title={country.name}
+                          children={country.branches.map((branch) => (
+                            <Caret
+                              key={branch.bname}
+                              title={branch.bname}
+                              children={branch.users.map((user) => (
+                                <Caret
+                                  key={user.fnm}
+                                  title={user.fnm}
+                                  children={user.favFoods.map((food) => (
+                                    <li
+                                      className="text-xl text-red-600"
+                                      key={food}
+                                    >
+                                      {food}
+                                    </li>
+                                  ))}
+                                />
+                              ))}
+                            />
+                          ))}
+                        />
+                      ))}
+                    </div>
+                  }
+                />
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -77,13 +75,14 @@ const Users = () => {
 
 const Caret = ({ children, title }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const hasChildren = children && children.length !== 0;
 
   const open = () => {
     setIsOpen((prev) => !prev);
   };
 
   return (
-    <div className="w-96">
+    <div className="">
       <span className={`caret ${isOpen && "caret-down"}`} onClick={open}>
         {title}
       </span>

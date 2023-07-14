@@ -1,3 +1,5 @@
+-- insert the values in the following order
+
 -- countries
 insert into countries (cname) values('israel');
 insert into countries (cname) values('usa');

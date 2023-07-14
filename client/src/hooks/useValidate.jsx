@@ -10,7 +10,6 @@ const useValidate = ({ fnm, lnm, email, phone, branch }) => {
   const [lnmValid, setLnmValid] = useState(true);
   const [emailValid, setEmailValid] = useState(true);
   const [phoneValid, setPhoneValid] = useState(true);
-  const [branchValid, setBranchValid] = useState(true);
 
   const checkValidate = () => {
     //validation
@@ -35,25 +34,17 @@ const useValidate = ({ fnm, lnm, email, phone, branch }) => {
       unvalid = true;
     } else setPhoneValid(true);
 
-    if (!namePattern.test(branch)) {
-      setBranchValid(false);
-      unvalid = true;
-    } else setBranchValid(true);
-
     return !unvalid;
   };
 
-  const resetValidation = () => {};
   return {
     fnmValid,
     lnmValid,
     emailValid,
     phoneValid,
-    branchValid,
     checkValidate,
     setPhoneValid,
     setEmailValid,
-    setBranchValid,
   };
 };
 

@@ -1,3 +1,5 @@
+-- some useful queries
+
 SELECT * FROM users
 
 -- to get users by branches
