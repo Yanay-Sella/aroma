@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
-import Checkbox from "../components/Checkbox.jsx";
 
+import Checkbox from "../components/Checkbox.jsx";
 import Logo from "../components/Logo.jsx";
+import Circlink from "../components/Circlink.jsx";
+import Input from "../components/Input.jsx";
 import useValidate from "../hooks/useValidate.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,29 +13,53 @@ import {
   faHouse,
   faUser,
   faHourglass,
+  faSitemap,
 } from "@fortawesome/free-solid-svg-icons";
-import Circlink from "../components/Circlink.jsx";
 
 const SignUp = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
+  const [branchesArr, setBranchesArr] = useState([]);
+  const [foodsArr, setFoodsArr] = useState([]);
+
   const [isLoading, setIsloading] = useState(false);
   const [show, setShow] = useState(false);
-
   const [snackMsg, setSnackMsg] = useState("");
 
-  const [userData, setUserData] = useState({
+  const defaultUser = {
     fnm: "",
     lnm: "",
     email: "",
     phone: "",
     branch: "",
     comment: "",
-  });
+  };
+  const [userData, setUserData] = useState(defaultUser);
 
   const [favList, setFavList] = useState([]);
 
   const { fnm, lnm, email, phone, comment, branch } = userData;
+
+  useEffect(() => {
+    const getAllFoods = async () => {
+      try {
+        const response = await axios.get(`${serverUrl}/user/foods`);
+        setFoodsArr(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllFoods();
+    const getAllBranches = async () => {
+      try {
+        const response = await axios.get(`${serverUrl}/user/branches`);
+        setBranchesArr(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllBranches();
+  }, []);
 
   const {
     fnmValid,
@@ -82,14 +107,7 @@ const SignUp = () => {
         setTimeout(() => {
           setIsloading(false);
           showSnack("User created");
-          setUserData({
-            fnm: "",
-            lnm: "",
-            email: "",
-            phone: "",
-            comment: "",
-            branch: "",
-          });
+          setUserData(defaultUser);
           setFavList([]);
         }, 1500);
       }
@@ -123,7 +141,13 @@ const SignUp = () => {
           }
           setIsloading(false);
         }, 1000);
-      } else setIsloading(false);
+      }
+      if (response.status === 500) {
+        setTimeout(() => {
+          setIsloading(false);
+          showSnack(`server error, please check your input`);
+        }, [1000]);
+      }
     }
   };
 
@@ -183,52 +207,24 @@ const SignUp = () => {
             value={branch}
             onChange={type}
           >
-            <option className="text-gray-900" value="telAviv">
-              telAviv
-            </option>
-            <option className="text-gray-900" value="rishon">
-              rishon
-            </option>
-            <option className="text-gray-900" value="holon">
-              holon
-            </option>
-            <option className="text-gray-900" value="newYork">
-              newYork
-            </option>
-            <option className="text-gray-900" value="california">
-              california
-            </option>
-            <option className="text-gray-900" value="texas">
-              texas
-            </option>
-            <option className="text-gray-900" value="ohio">
-              ohio
-            </option>
-            <option className="text-gray-900" value="munich">
-              munich
-            </option>
-            <option className="text-gray-900" value="berlin">
-              berlin
-            </option>
-            <option className="text-gray-900" value="budapest">
-              budapest
-            </option>
+            {branchesArr.map((b) => (
+              <option className="text-gray-900" value={b} key={b}>
+                {b}
+              </option>
+            ))}
           </select>
         </div>
 
         <h1 className="text-red-600 text-xl">{"Favorite foods or drinks"}</h1>
         <div className="text-white grid grid-cols-2">
-          <Checkbox name="Coffee" setFavList={setFavList} favList={favList} />
-          <Checkbox name="Sandwich" setFavList={setFavList} favList={favList} />
-          <Checkbox
-            name="Croissant"
-            setFavList={setFavList}
-            favList={favList}
-          />
-          <Checkbox name="Tea" setFavList={setFavList} favList={favList} />
-          <Checkbox name="Cookie" setFavList={setFavList} favList={favList} />
-          <Checkbox name="Eggs" setFavList={setFavList} favList={favList} />
-          <Checkbox name="Bread" setFavList={setFavList} favList={favList} />
+          {foodsArr.map((f) => (
+            <Checkbox
+              name={f}
+              setFavList={setFavList}
+              favList={favList}
+              key={f}
+            />
+          ))}
         </div>
 
         {isLoading ? (
@@ -247,9 +243,12 @@ const SignUp = () => {
 
       {/* links to other pages */}
       <div className="flex gap-4 ">
-        <Circlink to="/" icon={faHouse} />
         <Circlink to="/users" icon={faUser} />
+        <Circlink to="/" icon={faHouse} />
+        <Circlink to="/data" icon={faSitemap} />
       </div>
+
+      {/* snack bar */}
       <div
         className={`snackbar fonty justify-self-center rounded-lg bg-gray-900 px-5 py-3 text-red-600 text-xl ${
           show && "snackbarshow"
@@ -261,18 +260,4 @@ const SignUp = () => {
   );
 };
 
-const Input = ({ placeholder, name, value, type, valid }) => {
-  return (
-    <input
-      className={`tracking-wider bg-gray-900 bg-opacity-60 border-2 ${
-        !valid ? "border-red-600" : "border-transparent"
-      } rounded-md p-1 px-3 text-white`}
-      type="text"
-      placeholder={placeholder}
-      name={name}
-      onChange={type}
-      value={value}
-    />
-  );
-};
 export default SignUp;

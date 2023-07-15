@@ -87,6 +87,10 @@ code {
   }
 }
 
+textarea {
+  resize: none;
+}
+
 /* Remove default bullets */
 /* ul,
 #myUL {

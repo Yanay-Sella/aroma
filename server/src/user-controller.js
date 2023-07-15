@@ -13,7 +13,29 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getAllFoods = async (req, res) => {
+  try {
+    let allFoods = await pool.query("SELECT * FROM foods");
+    allFoods = allFoods.rows.map((e) => e.fname);
+    return res.status(200).json(allFoods);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
 const getAllBranches = async (req, res) => {
+  try {
+    let allBranches = await pool.query("SELECT bname FROM branches");
+    allBranches = allBranches.rows.map((e) => e.bname);
+    return res.status(200).json(allBranches);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+const getAllData = async (req, res) => {
   try {
     let allBranches = await pool.query("SELECT * FROM branches");
     let loves = await pool.query(
@@ -146,5 +168,7 @@ module.exports = {
   handleDelete,
   handleEdit,
   handleSignUp,
+  getAllData,
+  getAllFoods,
   getAllBranches,
 };
