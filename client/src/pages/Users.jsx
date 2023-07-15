@@ -1,12 +1,16 @@
 import React from "react";
-import Logo from "../components/Logo.jsx";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axios from "axios";
+
 import User from "../components/User.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faMugSaucer } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import Logo from "../components/Logo.jsx";
 import Circlink from "../components/Circlink.jsx";
+
+import {
+  faHouse,
+  faMugSaucer,
+  faSitemap,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Users = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
@@ -17,7 +21,7 @@ const Users = () => {
     const getAllUsers = async () => {
       try {
         const response = await axios.get(`${serverUrl}/user`);
-        setUsersArr(response.data); //array from db
+        setUsersArr(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -31,6 +35,7 @@ const Users = () => {
         <div className="flex flex-col items-center gap-6">
           <Logo />
           <div className="flex gap-4 ">
+            <Circlink to="/data" icon={faSitemap} />
             <Circlink to="/" icon={faHouse} />
             <Circlink to="signup" icon={faMugSaucer} />
           </div>

@@ -1,9 +1,15 @@
-import React from "react";
-import Logo from "../components/Logo.jsx";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { faHouse } from "@fortawesome/free-solid-svg-icons";
+
+import Logo from "../components/Logo.jsx";
 import Circlink from "../components/Circlink.jsx";
+import Caret from "../components/Caret.jsx";
+
+import {
+  faHouse,
+  faUser,
+  faMugSaucer,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Users = () => {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
@@ -11,22 +17,26 @@ const Users = () => {
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    const getAllBranches = async () => {
+    const getAllData = async () => {
       try {
-        const response = await axios.get(`${serverUrl}/user/branches`);
+        const response = await axios.get(`${serverUrl}/user/data`);
         setCountries(response.data.countries);
       } catch (error) {
         console.log(error);
       }
     };
-    getAllBranches();
+    getAllData();
   }, []);
 
   return (
     <div>
       <div className="flex flex-col items-center gap-6 w-96">
         <Logo />
-        <Circlink to="/" icon={faHouse} />
+        <div className="flex gap-4 ">
+          <Circlink to="/users" icon={faUser} />
+          <Circlink to="/" icon={faHouse} />
+          <Circlink to="/signup" icon={faMugSaucer} />
+        </div>
         {countries && (
           <div className="text-white fonty text-2xl w-96 p-2 border-2 border-white rounded-md">
             <ul id="myUL">
@@ -69,24 +79,6 @@ const Users = () => {
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-const Caret = ({ children, title }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const hasChildren = children && children.length !== 0;
-
-  const open = () => {
-    setIsOpen((prev) => !prev);
-  };
-
-  return (
-    <div className="">
-      <span className={`caret ${isOpen && "caret-down"}`} onClick={open}>
-        {title}
-      </span>
-      <ul className={`${isOpen ? "active" : "nested"}`}>{children}</ul>
     </div>
   );
 };
