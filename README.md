@@ -21,8 +21,8 @@ Two customers are distinct by their email and/or their phone number.
 
 1. Clone the repository.
 2. Ask for the ```.env``` files and put them in the root of frontend and backend.
-3. run ```cd ./server/src && npm i && nodemon server.js```.
-4. run ```cd ./client && npm i && npm run dev```.
+3. run ```cd ./server && npm i && npm run dev```.
+4. run ```cd ./client && npm i && npm start```.
 5. Open ```http://localhost:3000``` in the browser.
 
 ## Contributing
