@@ -6,7 +6,7 @@
 
 An administrator system to manage Aroma customers.
 The user can create, delete, and edit customers.
-Each user has its own first and last name, email, phone number, and a comment about the place.
+Each user has its own first and last name, email, phone number, branch, favorite foods, and a comment about the place.
 Two customers are distinct by their email and/or their phone number.
 
 ## Technologies
