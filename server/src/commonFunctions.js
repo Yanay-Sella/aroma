@@ -1,9 +1,12 @@
 const pool = require("./database/db.js");
 
-const validate = (fnm, lnm, email, phone, comment, branch) => {
+const validate = async (fnm, lnm, email, phone, comment, branch) => {
+  console.log("validating...");
   const namePattern = /^[a-z]{1,10}$/i; //first and last
   const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   const phonePattern = /^0\d{9}$/;
+
+  if (!fnm || !lnm || !email || !phone || !branch) return false;
 
   if (!namePattern.test(fnm) || !namePattern.test(lnm)) return false;
   if (!emailPattern.test(email)) return false;
@@ -11,6 +14,17 @@ const validate = (fnm, lnm, email, phone, comment, branch) => {
   if (!namePattern.test(branch)) return false;
 
   if (typeof comment !== "string") return false;
+
+  try {
+    const existingBranch = await pool.query(
+      "SELECT * FROM branches WHERE bname=$1",
+      [branch]
+    );
+    console.log(existingBranch.rows.length);
+    if (existingBranch.rows.length == 0) return false;
+  } catch (error) {
+    console.log(error);
+  }
 
   console.log("Validation passed");
   return true;

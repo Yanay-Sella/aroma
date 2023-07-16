@@ -7,6 +7,7 @@ import Logo from "../components/Logo.jsx";
 import Circlink from "../components/Circlink.jsx";
 import Input from "../components/Input.jsx";
 import useValidate from "../hooks/useValidate.jsx";
+import CirclinkGroup from "../components/CirclinkGroup.jsx";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,6 +15,7 @@ import {
   faUser,
   faHourglass,
   faSitemap,
+  faMugSaucer,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SignUp = () => {
@@ -88,7 +90,6 @@ const SignUp = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
     const valid = checkValidate();
 
     if (!valid) {
@@ -102,7 +103,6 @@ const SignUp = () => {
         ...userData,
         favList,
       });
-      console.log(response);
       if (response.status === 200) {
         setTimeout(() => {
           setIsloading(false);
@@ -142,6 +142,12 @@ const SignUp = () => {
           setIsloading(false);
         }, 1000);
       }
+      if (response.status === 400) {
+        setTimeout(() => {
+          setIsloading(false);
+          showSnack(`input not valid`);
+        }, [1000]);
+      }
       if (response.status === 500) {
         setTimeout(() => {
           setIsloading(false);
@@ -154,6 +160,9 @@ const SignUp = () => {
   return (
     <div className="flex flex-col items-center gap-6 w-96">
       <Logo />
+
+      {/* links to other pages */}
+      <CirclinkGroup highlighted={"signup"} />
 
       <form className="flex flex-col gap-4 w-full border-2 rounded-lg p-3 fonty">
         <h1 className="text-white fonty self-center text-3xl">Sign Up</h1>
@@ -207,6 +216,9 @@ const SignUp = () => {
             value={branch}
             onChange={type}
           >
+            <option className="text-gray-900" value={"branch"} selected>
+              {"branch"}
+            </option>
             {branchesArr.map((b) => (
               <option className="text-gray-900" value={b} key={b}>
                 {b}
@@ -240,13 +252,6 @@ const SignUp = () => {
           </button>
         )}
       </form>
-
-      {/* links to other pages */}
-      <div className="flex gap-4 ">
-        <Circlink to="/users" icon={faUser} />
-        <Circlink to="/" icon={faHouse} />
-        <Circlink to="/data" icon={faSitemap} />
-      </div>
 
       {/* snack bar */}
       <div

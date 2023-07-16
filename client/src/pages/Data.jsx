@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import Logo from "../components/Logo.jsx";
-import Circlink from "../components/Circlink.jsx";
 import Caret from "../components/Caret.jsx";
+import CirclinkGroup from "../components/CirclinkGroup.jsx";
 
 import {
   faHouse,
@@ -32,11 +32,7 @@ const Users = () => {
     <div>
       <div className="flex flex-col items-center gap-6 w-96">
         <Logo />
-        <div className="flex gap-4 ">
-          <Circlink to="/users" icon={faUser} />
-          <Circlink to="/" icon={faHouse} />
-          <Circlink to="/signup" icon={faMugSaucer} />
-        </div>
+        <CirclinkGroup highlighted={"data"} />
         {countries && (
           <div className="text-white fonty text-2xl w-96 p-2 border-2 border-white rounded-md">
             <ul id="myUL">

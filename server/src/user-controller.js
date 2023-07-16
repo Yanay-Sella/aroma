@@ -1,7 +1,6 @@
 const pool = require("./database/db.js");
 
 const { validate, checkConflict } = require("./commonFunctions.js");
-const { all } = require("axios");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -39,7 +38,7 @@ const getAllData = async (req, res) => {
   try {
     let allBranches = await pool.query("SELECT * FROM branches");
     let loves = await pool.query(
-      "SELECT fnm, food, branch FROM users, loves WHERE userId=id"
+      "SELECT id, food, branch FROM users, loves WHERE userId=id"
     );
     let allUsers = await pool.query("SELECT * FROM users ORDER BY id");
 
@@ -48,23 +47,21 @@ const getAllData = async (req, res) => {
     allUsers = allUsers.rows;
 
     allUsers = allUsers.map((user) => {
-      let favFoods = loves.filter((love) => love.fnm === user.fnm);
+      let favFoods = loves.filter((love) => love.id === user.id);
       favFoods = favFoods.map((food) => food.food);
       return { ...user, favFoods };
     });
 
     allBranches = allBranches.map((e) => {
-      const bUsers = allUsers.filter((user) => user.branch === e.bname);
-      return { ...e, users: bUsers };
+      const users = allUsers.filter((user) => user.branch === e.bname); //all users in a specific branch
+      return { ...e, users };
     });
 
     let countries = allBranches.map((e) => e.country);
     countries = [...new Set(countries)];
     countries = countries.map((country) => {
-      let cBranches = allBranches.filter(
-        (branch) => branch.country === country
-      );
-      return { name: country, branches: cBranches };
+      let branches = allBranches.filter((branch) => branch.country === country); //all branches in a specific country
+      return { name: country, branches };
     });
 
     return res.status(200).json({ allBranches, countries });
@@ -77,10 +74,12 @@ const getAllData = async (req, res) => {
 const handleSignUp = async (req, res) => {
   try {
     let { fnm, lnm, email, phone, comment, branch, favList } = req.body;
-    console.log(req.body);
     email = email.toLowerCase();
 
-    if (!validate(fnm, lnm, email, phone, comment, branch)) {
+    const valid = await validate(fnm, lnm, email, phone, comment, branch);
+
+    if (!valid) {
+      console.log("input not valid");
       return res.status(400).json({ message: "input not valid" });
     }
 
