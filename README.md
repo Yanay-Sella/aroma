@@ -21,9 +21,10 @@ Two customers are distinct by their email and/or their phone number.
 
 1. Clone the repository.
 2. Ask for the ```.env``` files and put them in the root of frontend and backend.
-3. run ```cd ./server && npm i && npm run dev```.
-4. run ```cd ./client && npm i && npm start```.
-5. Open ```http://localhost:3000``` in the browser.
+3. Set up your own sql database locally and manually run the queries in the db folder
+4. Run ```cd ./server && npm i && npm run dev```.
+5. Run ```cd ./client && npm i && npm start```.
+6. Open ```http://localhost:3000``` in the browser.
 
 ## Contributing
 If you would like to contribute to Aroma, please fork the repository and create a pull request.
